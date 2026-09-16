@@ -1,0 +1,4 @@
+data/**/*.json
+dist/
+.astro/
+node_modules/

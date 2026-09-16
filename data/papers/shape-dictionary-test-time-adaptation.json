@@ -1,0 +1,110 @@
+{
+  "id": "shape-dictionary-test-time-adaptation",
+  "title": "Single-Domain Generalization in Medical Image Segmentation via Test-Time Adaptation from Shape Dictionary",
+  "authors": [
+    "Quande Liu",
+    "Cheng Chen",
+    "Qi Dou",
+    "Pheng-Ann Heng"
+  ],
+  "year": 2022,
+  "publication_date": "2022-02-22",
+  "venue_or_source": "AAAI 2022",
+  "venue_type": "Conference",
+  "ranking": {
+    "ccf": null,
+    "cas": null,
+    "jcr": null,
+    "ranking_year": null,
+    "ranking_source": null
+  },
+  "identifiers": {
+    "doi": null,
+    "arxiv": null,
+    "openreview": null
+  },
+  "urls": {
+    "paper": "https://ojs.aaai.org/index.php/AAAI/article/download/20068/19827",
+    "code": null
+  },
+  "topics": [
+    "医学图像分割单源域泛化",
+    "结构先验与边界建模",
+    "测试时适应"
+  ],
+  "relevance": "High",
+  "reading_basis": "full_text",
+  "quick_read": {
+    "tldr": "TASD 从单一源域学习跨域较稳定的解剖形状字典，并在测试时用分割与形状系数的双重一致性更新归一化参数；核心思想是把相对稳定的形状先验与逐样本适应结合。",
+    "problem_and_motivation": "多源域数据在医疗场景可能受隐私与跨机构共享限制。常见增强也难以预先模拟诸如设备、线圈或中心造成的大幅变化；作者转而利用分割形状相对稳定这一归纳偏置。",
+    "core_method": "训练时用字典学习从源域掩膜提取形状原型，并将回归分支接入分割网络以组合先验。测试时对每个目标样本施加输入扰动，用分割输出和形状系数的双一致性损失进行一步在线适应。",
+    "key_results": "在前列腺 MRI 与眼底分割的多个未见域上，TASD 的平均 Dice 优于比较方法；消融中，加入测试时适应后，相对“基线+形状字典”在两个任务分别再提高 2.7 和 1.4 个百分点（论文第 5 页）。",
+    "why_it_matters": "它把单源域泛化拆成可复用的结构先验和推理期适应两部分，为后续比较“只训练期增强”与“测试时更新”提供清晰基线。"
+  },
+  "detail": {
+    "motivation": "论文指出，多源域泛化依赖的数据聚合在医学影像中可能受隐私、伦理审批和患者同意流程限制。仅用一个源域时，外观变化难以模拟；但不同中心的器官分割形状通常较稳定，而且目标样本本身可以在推理时提供适应线索（Introduction，第 1 页）。",
+    "contributions": [
+      {
+        "contribution": "提出 TASD：从单源域标注中学习语义形状字典，并把字典先验集成到分割网络。",
+        "source": "Introduction，第 1 页；Method，第 2 页"
+      },
+      {
+        "contribution": "提出测试时双一致性适应，同时约束扰动下的分割预测和形状系数；只更新归一化参数，并在线处理测试样本。",
+        "source": "Method，第 3 页"
+      },
+      {
+        "contribution": "在前列腺 MRI 与眼底分割任务的多个未见域开展评估，并通过消融拆分形状字典和测试时适应的作用。",
+        "source": "Experiments，第 4–6 页"
+      }
+    ],
+    "research_questions": [
+      {
+        "type": "inferred",
+        "question": "在仅有一个标注源域时，如何利用可迁移的解剖形状先验提升医学图像分割对未见域的泛化？",
+        "how": "以单源标注掩膜学习形状字典，将字典组合系数接入分割网络，并在推理时利用双一致性约束适应目标样本。",
+        "answer": "作者报告，形状字典与测试时适应在两个分割任务的未见域上带来一致收益；测试时适应叠加字典后继续提高平均 Dice。",
+        "meaning": "这使结构先验成为可与外观增强互补的单源域泛化路径，同时引入推理期计算与测试流假设。",
+        "source": "Introduction，第 1 页"
+      }
+    ],
+    "research_questions_empty_reason": null,
+    "research_questions_empty_source": null,
+    "method": "TASD 包含形状字典学习、网络集成和测试时适应。源域分割掩膜经在线字典学习形成一组原型；回归分支预测系数并组合参考形状。推理时，对同一目标样本构造输入扰动，最小化分割输出一致性和字典系数一致性损失，仅更新批归一化参数。作者报告每张 2D 图像平均约 56 ms、每个体数据约 0.91 s 的适应开销（Method，第 3 页）。",
+    "experiments_and_key_findings": "实验包含前列腺 MRI 和视网膜眼底图像分割。论文称 TASD 在平均表现上优于比较方法，并在前列腺的三个未见中心及眼底域改善基线。消融显示，形状字典本身已有收益，进一步加入测试时适应后两个任务的平均 Dice 分别增加 2.7 和 1.4 个百分点（Experiments 与 Ablation，第 4–6 页）。",
+    "limitations": {
+      "author_reported": [
+        "作者在结论中提出未来可将字典形状先验扩展到多模态学习，并进一步评估；论文没有单列 Limitations 小节（Conclusion，第 6 页）。"
+      ],
+      "ai_analysis": [
+        "测试时适应依赖目标样本可用于推理期更新；不同部署若要求严格的静态模型或样本相互独立，需要额外评估其适用性。",
+        "实验聚焦前列腺 MRI 与眼底任务，不能仅凭这些结果推断到所有器官、模态或扫描协议。"
+      ]
+    },
+    "relation_to_research": "这是结构先验和测试时适应方向的代表基线。对单源域医学图像分割研究，可与频域增强类方法按训练阶段、测试阶段是否更新模型、以及解剖结构是否显式建模进行对照。",
+    "what_can_be_done_next": "复现时先按原文拆分基线、shape-dictionary-only 与 TASD 三组；再在固定测试顺序和随机打乱顺序下比较在线更新的影响，并报告单病例适应耗时与跨中心 Dice。"
+  },
+  "original_abstract": "Domain generalization typically requires data from multiple source domains for model learning. This paper studies single-domain generalization for medical image segmentation by extracting semantic shape priors from one domain and using test-time adaptation with dual-consistency regularization to incorporate those priors on unseen domains. Experiments on prostate MRI and retinal fundus segmentation show improvements across unseen domains.",
+  "bibtex": null,
+  "figures": [],
+  "evidence": [
+    {
+      "claim": "单源域设定与形状先验动机",
+      "locator": "Introduction，第 1 页",
+      "url": "https://ojs.aaai.org/index.php/AAAI/article/download/20068/19827"
+    },
+    {
+      "claim": "双一致性在线测试时适应",
+      "locator": "Method，第 3 页",
+      "url": "https://ojs.aaai.org/index.php/AAAI/article/download/20068/19827"
+    },
+    {
+      "claim": "加入测试时适应后的 Dice 增益",
+      "locator": "Ablation Study，第 5 页",
+      "url": "https://ojs.aaai.org/index.php/AAAI/article/download/20068/19827"
+    }
+  ],
+  "generated_by": "Codex; manually curated from the linked paper full text",
+  "generated_at": "2026-09-16T00:00:00+08:00",
+  "updated_at": "2026-09-16T00:00:00+08:00",
+  "owner_edited": false
+}

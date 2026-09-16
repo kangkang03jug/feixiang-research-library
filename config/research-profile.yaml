@@ -1,0 +1,35 @@
+profile:
+  researcher: 'FeiXiang'
+  library_name: "FeiXiang's Research Library"
+  description: '面向医学图像分割单源域泛化的中文研究知识库，持续整理论文、快速阅读摘要与可追溯的详细报告。'
+research_scope:
+  primary:
+    - '医学图像分割单源域泛化（Single-Source Domain Generalization）'
+  secondary:
+    - '医学图像领域泛化与跨中心、跨模态、跨序列评估'
+    - '频域建模、频谱增强与鲁棒表征'
+    - '解剖结构先验、边界建模与形状约束'
+    - '测试时适应与医学视觉基础模型'
+    - '极少标注条件下的泛化分割'
+paper_selection:
+  recent_year_window: 3
+  priority: [quality, relevance]
+  relevance_levels: [High, Medium, Low]
+  ranking_systems: []
+  conferences:
+    prefer: [MICCAI, MIDL, AAAI]
+    allow: []
+  journals:
+    prefer: [IEEE Transactions on Medical Imaging]
+    allow: []
+  preprints: { allowed: true, require_exact_source: true }
+language:
+  explanation: 'zh-CN'
+  terminology: 'mixed-zh-en'
+daily:
+  papers_per_run: 1
+  timezone: 'Asia/Shanghai'
+  scheduled_time: '08:00'
+editor:
+  owner_github_username: 'kangkang03jug'
+  api_origin: ''

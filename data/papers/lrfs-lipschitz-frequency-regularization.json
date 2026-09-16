@@ -1,0 +1,110 @@
+{
+  "id": "lrfs-lipschitz-frequency-regularization",
+  "title": "Single-source Domain Generalization in Deep Learning Segmentation via Lipschitz Regularization",
+  "authors": [
+    "Mazlum Ferhat Arslan",
+    "Weihong Guo",
+    "Shuo Li"
+  ],
+  "year": 2024,
+  "publication_date": "2024-10-06",
+  "venue_or_source": "MICCAI 2024",
+  "venue_type": "Conference",
+  "ranking": {
+    "ccf": null,
+    "cas": null,
+    "jcr": null,
+    "ranking_year": null,
+    "ranking_source": null
+  },
+  "identifiers": {
+    "doi": "10.1007/978-3-031-72117-5_62",
+    "arxiv": null,
+    "openreview": null
+  },
+  "urls": {
+    "paper": "https://papers.miccai.org/miccai-2024/paper/3740_paper.pdf",
+    "code": "https://github.com/kaptres/LRFS"
+  },
+  "topics": [
+    "医学图像分割单源域泛化",
+    "频域与频谱增强",
+    "跨中心 / 跨模态 / 跨序列域偏移"
+  ],
+  "relevance": "High",
+  "reading_basis": "full_text",
+  "quick_read": {
+    "tldr": "LRFS 不直接生成大量增强图像，而是在频域构造扰动并以 Lipschitz 正则约束表征：降低模型对高频变化的敏感度，同时保留对中频变化的响应。",
+    "problem_and_motivation": "高频分量既可能包含设备相关噪声，也承载边缘等关键分割信息；一味抹除高频可能损害轮廓，作者尝试分别控制不同频段的表征敏感度。",
+    "core_method": "按低/中/高频划分图像频谱，通过高频扰动与中频扰动构造相邻输入，近似控制模型表征映射的 Lipschitz 常数，并把两项正则加到原任务损失上。",
+    "key_results": "在六个前列腺 MRI 中心、四类模型上，LRFS 均提高目标域平均 Dice；例如 U-Net 从 73.22 提高到 77.62，BayeSeg 从 77.80 提高到 81.94（MICCAI 2024 PDF，第 7–8 页，Table 1）。",
+    "why_it_matters": "它提供与数据增强互补的模型侧频域约束，结果同时提醒：正则权重会受损失函数与权重衰减影响，需要透明报告调参策略。"
+  },
+  "detail": {
+    "motivation": "作者指出，高频区域可能含有设备噪声等域特异信息，但分割边缘也在高频中；简单移除高频会模糊边界。因此，方法目标是同时减少模型对高频变化的敏感度、鼓励对中频变化保持适当响应（Introduction，第 1–2 页）。",
+    "contributions": [
+      {
+        "contribution": "提出 LRFS，将高频/中频的谱扰动与潜在表征变化联系起来，分别形成敏感度约束。",
+        "source": "Method，第 3–5 页"
+      },
+      {
+        "contribution": "设计可叠加到任意任务损失上的正则形式，并在 U-Net、ResUNet、ResUNet++ 与 BayeSeg 上验证。",
+        "source": "Method，第 5 页；Experiments，第 6 页"
+      },
+      {
+        "contribution": "在单源 RUNMC、六中心前列腺 MRI 评估目标域 Dice，并报告正则权重敏感性。",
+        "source": "Experiments，第 6–8 页"
+      }
+    ],
+    "research_questions": [
+      {
+        "type": "inferred",
+        "question": "如何区分频谱中的域特异变化与有用边缘信息，并用可泛化的正则改善单源域模型在未见中心的性能？",
+        "how": "对高频和中频扰动分别施加 Lipschitz 型表征约束，再与分割任务损失联合训练。",
+        "answer": "在六中心前列腺 MRI 的四种模型上，目标域平均 Dice 均有提高；源域性能总体未明显牺牲。",
+        "meaning": "频率分解可用于调控模型表征稳定性，而不仅用于合成训练图像。",
+        "source": "Introduction，第 1–2 页，MICCAI 2024 PDF"
+      }
+    ],
+    "research_questions_empty_reason": null,
+    "research_questions_empty_source": null,
+    "method": "作者按归一化频率划分 LF、MF、HF。构造高频或中频扰动后的图像，并以网络潜在表示变化估计 Lipschitz 常数；高频正则限制敏感度，中频项鼓励必要响应。总损失为原损失加 λMF·LMF 与 λHF·LHF，论文实验中两项权重相等（Method，第 3–5 页）。",
+    "experiments_and_key_findings": "训练只使用 RUNMC 源中心，目标域包含 BIDMC、BMC、HK、UCL、HCRUDB。对比 U-Net、ResUNet、ResUNet++ 和 BayeSeg，四种模型的目标域平均 Dice 均提高：例如 U-Net 73.22→77.62，ResUNet 74.82→77.51，ResUNet++ 72.51→75.97，BayeSeg 77.80→81.94（Experiments，第 6–8 页，Table 1）。",
+    "limitations": {
+      "author_reported": [
+        "作者指出，权重可能需要随损失函数或 weight decay 改变而重新搜索；较大的 λ=0.1 在 BayeSeg 上明显变差（Experiments，第 7–8 页）。",
+        "作者把在医学图像分割之外的其他深度学习任务验证列为未来工作（Conclusion，第 8 页）。"
+      ],
+      "ai_analysis": [
+        "该项工作的频带切分与损失权重是实现敏感点；不同图像分辨率、前处理和设备噪声谱可能改变最优设置。",
+        "现有实验主要是单一器官/模态的多中心前列腺 MRI，对跨模态泛化的证据有限。"
+      ]
+    },
+    "relation_to_research": "LRFS 与 RAS4DG 都把频域作为单源域泛化线索，但前者通过潜在表征正则约束模型、后者在输入频谱与局部结构上构造增强。可以在同一数据划分中比较性能、训练开销和边界保真。",
+    "what_can_be_done_next": "基于原论文六中心设置复现四种模型，报告 λ 扫描曲线而非单个最优值；另外用边界 Dice/HD95 检查抑制高频后是否伤害轮廓，再和 RAS4DG 的输入侧增强做组合实验。"
+  },
+  "original_abstract": "We propose Lipschitz regularization via frequency spectrum (LRFS) for single-source domain generalization in medical image segmentation. It limits latent representation sensitivity to high-frequency components while encouraging sensitivity to middle-frequency components. Experiments across several model architectures show improved generalization.",
+  "bibtex": null,
+  "figures": [],
+  "evidence": [
+    {
+      "claim": "高频与中频的不同正则作用",
+      "locator": "Introduction，第 1–2 页；Method，第 3–5 页",
+      "url": "https://papers.miccai.org/miccai-2024/paper/3740_paper.pdf"
+    },
+    {
+      "claim": "六中心前列腺 MRI 设置与目标域 Dice",
+      "locator": "Experiments，第 6–8 页；Table 1",
+      "url": "https://papers.miccai.org/miccai-2024/paper/3740_paper.pdf"
+    },
+    {
+      "claim": "正则权重敏感性及未来工作",
+      "locator": "Experiments 与 Conclusion，第 7–8 页",
+      "url": "https://papers.miccai.org/miccai-2024/paper/3740_paper.pdf"
+    }
+  ],
+  "generated_by": "Codex; manually curated from the linked paper full text",
+  "generated_at": "2026-09-16T00:00:00+08:00",
+  "updated_at": "2026-09-16T00:00:00+08:00",
+  "owner_edited": false
+}

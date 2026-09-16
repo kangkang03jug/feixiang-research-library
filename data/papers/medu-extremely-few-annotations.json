@@ -1,0 +1,112 @@
+{
+  "id": "medu-extremely-few-annotations",
+  "title": "Fusing Dual Encoders: Single-source Domain Generalization with Extremely Few Annotations",
+  "authors": [
+    "Ruofan Wang",
+    "Jintao Guo",
+    "Jian Zhang",
+    "Lei Qi",
+    "Yinghuan Shi"
+  ],
+  "year": 2025,
+  "publication_date": null,
+  "venue_or_source": "MICCAI 2025",
+  "venue_type": "Conference",
+  "ranking": {
+    "ccf": null,
+    "cas": null,
+    "jcr": null,
+    "ranking_year": null,
+    "ranking_source": null
+  },
+  "identifiers": {
+    "doi": null,
+    "arxiv": null,
+    "openreview": null
+  },
+  "urls": {
+    "paper": "https://papers.miccai.org/miccai-2025/paper/2169_paper.pdf",
+    "code": null
+  },
+  "topics": [
+    "医学图像分割单源域泛化",
+    "极少标注与基础模型",
+    "跨中心 / 跨模态 / 跨序列域偏移",
+    "一致性学习与多尺度特征融合"
+  ],
+  "relevance": "High",
+  "reading_basis": "full_text",
+  "quick_read": {
+    "tldr": "MEDU 面向极少标注的单源域泛化，将 CNN 编码器与预训练 SAM2 Transformer 编码器融合，并以扰动一致性约束多尺度预测；在三个跨域任务中用 3–4 个标注体数据取得有竞争力的 Dice。",
+    "problem_and_motivation": "既有单源域泛化方法常需要一定数量的标注体数据；样本进一步减少时容易过拟合源域，基础分割网络又较难从极少样本学习长程语义。",
+    "core_method": "采用 dual-encoder U-shaped network：CNN 与冻结 Hiera/SAM2 编码器经多尺度特征融合；训练中叠加强度扰动、通道 dropout 和 hierarchical consistency，使同一图像多种扰动下的多尺度预测保持一致。",
+    "key_results": "在腹部 MRI→CT（3 volumes）、腹部 CT→MRI（4）和心脏 bSSFP→LGE（3）设置中，平均 Dice 分别为 81.75%、85.51%、78.24%；作者报告前两个设置较先进比较方法提高 12.60 和 4.19 个百分点（MICCAI 2025 PDF，第 6–7 页，Tables 1–3）。",
+    "why_it_matters": "它把极少标签这一真实约束与单源域泛化结合，并检验预训练视觉基础模型是否可缓解小样本过拟合。"
+  },
+  "detail": {
+    "motivation": "作者指出，单源域泛化仍需要一定量标注才能得到有竞争力结果；当标注只有少数体数据时，既有方法会源域过拟合，域偏移又会进一步放大错误。SAM2 的预训练表示提供初始化，但如何与 U-Net 式多尺度特征和目标域泛化配合仍需设计（Introduction，第 1–2 页）。",
+    "contributions": [
+      {
+        "contribution": "提出 MEDU，将 CNN 与 SAM2 预训练 Transformer 编码器组合进 U-shaped segmentation network。",
+        "source": "Introduction，第 2 页；Method，第 3–5 页"
+      },
+      {
+        "contribution": "提出扰动一致性训练：强度扰动和通道 dropout 配合多尺度 hierarchical consistency。",
+        "source": "Method，第 5–6 页"
+      },
+      {
+        "contribution": "在腹部 MRI-CT、腹部 CT-MRI、心脏 bSSFP-LGE 三种设置评估，仅使用 3、4、3 个源域标注体数据。",
+        "source": "Experiments，第 6–7 页；Tables 1–3"
+      }
+    ],
+    "research_questions": [
+      {
+        "type": "inferred",
+        "question": "在只有极少标注的单源域医学分割中，能否借助预训练 SAM2 特征和多尺度一致性学习提升未见域泛化？",
+        "how": "融合 CNN/SAM2 双编码器的多尺度特征，并在多种图像扰动下约束分割预测一致。",
+        "answer": "在三种跨模态/跨序列任务中，MEDU 使用 3–4 个标注体数据并取得高于论文对比方法的平均 Dice。",
+        "meaning": "视觉基础模型可作为少标注场景的初始化，但结构融合和一致性目标仍是泛化性能的重要组成。",
+        "source": "Introduction，第 1–2 页，MICCAI 2025 PDF"
+      }
+    ],
+    "research_questions_empty_reason": null,
+    "research_questions_empty_source": null,
+    "method": "MEDU 使用 CNN-based encoder 和基于 SAM2 Hiera 的 Transformer encoder，后者采用冻结预训练块并插入 adapter；两路的多尺度特征经 FFM 融合后进入 U-shaped decoder。训练阶段对同一批图像施加强度变换和通道 dropout，再对三层多尺度预测施加对称 KL hierarchical consistency；损失还包含交叉熵和 Dice（Method，第 3–6 页）。",
+    "experiments_and_key_findings": "评估三个跨域设置：腹部 T2-SPIR MRI→CT、CT→MRI 和心脏 bSSFP→LGE。训练仅用 3、4、3 个标注体数据。MEDU 平均 Dice 分别是 81.75%、85.51%、78.24%；相对文中先进比较方法，前两个设置报告增益 12.60 和 4.19 个百分点。消融中去掉 hierarchical consistency 后三设置 Dice 为 81.41%、85.34%、77.86%，均低于完整模型（Experiments，第 6–8 页，Tables 1–4）。",
+    "limitations": {
+      "author_reported": [
+        "论文没有单列 Limitations 小节；结论归纳的是三个跨域设置上的结果，未声称涵盖所有器官、扫描协议或极少标注任务。"
+      ],
+      "ai_analysis": [
+        "三种设置中每个任务的标注量虽少，但任务类别、数据来源和切分仍较特定；在外部机构验证前不应将结果解释为临床部署可靠性。",
+        "SAM2 分支使用预训练权重，复现时需记录权重来源、冻结策略和 adapter 设置，并与只用 CNN 的公平基线比较。"
+      ]
+    },
+    "relation_to_research": "这是当前主题中面向小样本与基础模型的代表方向，可与 RAS4DG/LRFS 的频率稳健性方法以及 TASD 的形状先验方法形成互补。值得关注基础模型带来的收益是否依赖预训练数据与更大推理成本。",
+    "what_can_be_done_next": "先复现三个源/目标划分和每类标签体数，保留相同训练样本顺序；再做 CNN-only、SAM2-only、dual encoder、去除 hierarchical consistency 四组消融，并报告不同随机种子的均值与方差。"
+  },
+  "original_abstract": "We study single-source domain generalization with extremely few annotations. MEDU combines a CNN encoder and a pretrained SAM2 transformer encoder in a U-shaped network, with multiscale feature fusion and perturbation consistency training. Experiments cover abdominal MRI-to-CT, abdominal CT-to-MRI, and cardiac bSSFP-to-LGE settings.",
+  "bibtex": null,
+  "figures": [],
+  "evidence": [
+    {
+      "claim": "MEDU 结构和三项贡献",
+      "locator": "Introduction，第 2 页",
+      "url": "https://papers.miccai.org/miccai-2025/paper/2169_paper.pdf"
+    },
+    {
+      "claim": "极少标注训练设置与 Dice 结果",
+      "locator": "Experiments，第 6–7 页；Tables 1–3",
+      "url": "https://papers.miccai.org/miccai-2025/paper/2169_paper.pdf"
+    },
+    {
+      "claim": "Hierarchical consistency 消融",
+      "locator": "Ablation Study，第 7–8 页；Table 4",
+      "url": "https://papers.miccai.org/miccai-2025/paper/2169_paper.pdf"
+    }
+  ],
+  "generated_by": "Codex; manually curated from the linked paper full text",
+  "generated_at": "2026-09-16T00:00:00+08:00",
+  "updated_at": "2026-09-16T00:00:00+08:00",
+  "owner_edited": false
+}

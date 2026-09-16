@@ -1,0 +1,10 @@
+{
+  "date": "2026-09-16",
+  "recommendations": [
+    {
+      "paper_id": "medu-extremely-few-annotations",
+      "primary": true,
+      "run_type": "manual"
+    }
+  ]
+}
