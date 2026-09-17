@@ -1,7 +1,11 @@
 import { test, expect } from '@playwright/test';
 test('personal library exposes the paper pool, archive, and paper reports', async ({ page }) => {
   await page.goto('/');
-  await expect(page.getByRole('heading', { name: "FeiXiang's Research Library" })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: '医学图像分割单源域泛化（Single-Source Domain Generalization）' }),
+  ).toBeVisible();
+  await expect(page.locator('.hero-subtitle')).toHaveText('Research Library');
+  await expect(page.locator('.hero .lede')).toContainText('面向医学图像分割单源域泛化');
   await page.getByRole('link', { name: '论文池', exact: true }).click();
   await expect(page.getByRole('heading', { name: '论文池' })).toBeVisible();
   await expect(
@@ -36,7 +40,7 @@ test('hero title wraps long text without overflowing at desktop and mobile width
       'A deliberately long research library title that should wrap naturally to fit the available content width without creating horizontal overflow';
   });
 
-  for (const width of [1280, 375]) {
+  for (const width of [1440, 1024, 390]) {
     await page.setViewportSize({ width, height: 800 });
     const metrics = await heroTitle.evaluate((element) => {
       const range = document.createRange();
