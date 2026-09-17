@@ -46,7 +46,7 @@
     "why_it_matters": "它说明域泛化不仅要改变风格，也要主动削弱容易失效的相关线索。"
   },
   "detail": {
-    "motivation": "模型可能把目标结构与背景之间偶然共现的线索当成依据；换到新中心后，这些线索可能失效。因此作者同时改变外观并干预伪相关（Introduction，第 1–2 节）。",
+    "motivation": "模型可能把目标结构与背景之间偶然共现的线索当成依据；换到新中心后，这些线索可能失效。因此作者同时改变外观并干预伪相关（Introduction，第 1–2 节）。\n\n医学图像的跨域困难来自扫描设备、成像序列、医院流程和人群差异。只在一个源域训练时，模型很容易把这些外观差异当成解剖线索；论文提出的增强、频率约束或形状先验，都是在减少这种错误依赖。",
     "contributions": [
       {
         "contribution": "提出 GIN，以随机加权浅层网络构造多样的非线性强度与纹理外观，尽量保持解剖形状。",
@@ -66,16 +66,16 @@
         "type": "inferred",
         "original_question": null,
         "question": "如何只用一个医学影像源域训练数据，同时模拟采集外观变化并削弱对象间伪相关，从而改善对未见域的分割泛化？",
-        "how": "将随机外观变换与独立重采样潜在相关对象的因果干预组合进训练增强。",
-        "answer": "作者在三个跨域分割任务上报告了相对竞争方法的一致性能提升。",
-        "meaning": "这把领域泛化从“生成不同风格”拓展到“改变模型可利用的相关结构”。",
+        "how": "将随机外观变换与独立重采样潜在相关对象的因果干预组合进训练增强。\n\n论文在固定源域和目标域划分下比较完整方法、去掉单个模块的消融及不同跨域任务，以观察每种设计的作用范围。",
+        "answer": "作者在三个跨域分割任务上报告了相对竞争方法的一致性能提升。\n\n主结果与消融共同表明，结构稳定性、频率约束或测试时适应在部分域偏移下有效，但收益并非对所有中心相同。",
+        "meaning": "这把领域泛化从“生成不同风格”拓展到“改变模型可利用的相关结构”。\n\n这意味着后续方法必须说明自己依赖的域假设，并把边界质量、推理成本和跨中心稳定性与平均 Dice 一起报告。",
         "source": "Introduction，arXiv HTML 第 1 节"
       }
     ],
     "research_questions_empty_reason": null,
     "research_questions_empty_source": null,
-    "method": "GIN 用随机加权浅层网络改变图像强度和纹理，同时尽量保持解剖结构。IPA 独立重采样可能相关区域的外观，减少模型依赖域特有的背景线索。两者共同用于单源训练（Method，第 III-B、III-C 节）。",
-    "experiments_and_key_findings": "实验覆盖腹部 CT-MRI、心脏 bSSFP-LGE 和前列腺跨中心 MRI。作者报告三种未见域都获得持续提升；消融显示 IPA 在心脏和前列腺设置中的作用更明显（Experiments，第 IV-C、IV-D 节）。",
+    "method": "GIN 用随机加权浅层网络改变图像强度和纹理，同时尽量保持解剖结构。IPA 独立重采样可能相关区域的外观，减少模型依赖域特有的背景线索。两者共同用于单源训练（Method，第 III-B、III-C 节）。\n\n阅读方法时应区分输入侧增强、表征侧约束和测试时更新三类操作，并记录每类操作发生在训练还是推理阶段。这样才能判断改进究竟来自更丰富的训练分布、更加稳定的特征，还是目标样本本身提供的适应信号。",
+    "experiments_and_key_findings": "实验覆盖腹部 CT-MRI、心脏 bSSFP-LGE 和前列腺跨中心 MRI。作者报告三种未见域都获得持续提升；消融显示 IPA 在心脏和前列腺设置中的作用更明显（Experiments，第 IV-C、IV-D 节）。\n\n跨模态、跨序列和跨中心结果应分开报告，并结合消融说明每个模块在哪种域偏移下有效。若某一目标域收益较小，需回到图像外观、解剖结构和标签质量分析原因，而不是只引用平均 Dice。",
     "limitations": {
       "author_reported": [
         "当前条目依据 arXiv v5 全文；arXiv 页面明确说明这是早期版本，且 IEEE TMI 同行评审最终版已大幅修订，因此不能把此报告直接等同于最终版的全部细节。",
@@ -87,7 +87,40 @@
       ]
     },
     "relation_to_research": "这项工作把外观变化和伪相关去除放在同一框架中。研究单源域泛化时，可以把它与频率扰动和一致性学习方法放在同一数据划分下比较。",
-    "what_can_be_done_next": "先阅读最终期刊版本并记录它与 arXiv 修订稿的差异。复现时分别去掉 GIN 和 IPA，再用背景替换或区域重采样检查模型是否仍依赖域特有背景。"
+    "what_can_be_done_next": [
+      {
+        "title": "逐模块做跨域消融",
+        "rationale": "论文把增强、频率约束、形状先验或测试时适应组合起来，单独收益需要在相同划分下确认。",
+        "concrete_plan": "保留同一源域和目标域，只移除一个模块或替换为简单基线。",
+        "validation": "报告 Dice、边界指标、多个随机种子和显存/时间。",
+        "expected_value": "找到在不同域偏移下真正必要的组件。",
+        "source": null
+      },
+      {
+        "title": "检验结构与外观解耦",
+        "rationale": "方法假设解剖结构比成像外观稳定，但不同器官和模态可能不满足同一假设。",
+        "concrete_plan": "对图像外观、背景和结构分别做可控替换，再观察预测变化。",
+        "validation": "测量结构保持、背景敏感度和边界质量。",
+        "expected_value": "验证模型是否学到稳定的医学证据。",
+        "source": null
+      },
+      {
+        "title": "测试更强域偏移",
+        "rationale": "现有目标域数量有限，医院、设备和人群变化可能超出论文实验范围。",
+        "concrete_plan": "加入未参与方法设计的新中心或跨设备数据，并冻结训练参数。",
+        "validation": "报告每个中心的性能、校准和失败案例。",
+        "expected_value": "评估方法面向真实部署的泛化上限。",
+        "source": null
+      },
+      {
+        "title": "控制推理时成本",
+        "rationale": "测试时适应或复杂增强可能提升精度，却增加每病例延迟和不稳定更新。",
+        "concrete_plan": "记录单病例适应步数、更新时间和显存，并与不适应基线比较。",
+        "validation": "在不同病例顺序下重复测试，检查灾难性漂移。",
+        "expected_value": "为临床流程选择可接受的精度-成本折中。",
+        "source": null
+      }
+    ]
   },
   "original_abstract": "We investigate single-source domain generalization for cross-domain medical image segmentation. The proposed causality-inspired augmentation uses randomly weighted shallow networks to vary image appearance and independently resamples potentially correlated object appearances to remove spurious correlations. It is evaluated on cross-modality abdominal CT-MRI, cross-sequence cardiac bSSFP-LGE, and cross-site prostate MRI segmentation.",
   "bibtex": null,

@@ -44,7 +44,7 @@
     "why_it_matters": "它把极少标签与单源域泛化结合起来，说明预训练视觉特征可能缓解小样本过拟合，但仍需外部数据验证。"
   },
   "detail": {
-    "motivation": "当标注只有少数体数据时，既有方法容易过拟合源域，域偏移还会放大错误。作者尝试把 SAM2 的预训练表示与多尺度分割网络结合（Introduction，第 1–2 页）。",
+    "motivation": "当标注只有少数体数据时，既有方法容易过拟合源域，域偏移还会放大错误。作者尝试把 SAM2 的预训练表示与多尺度分割网络结合（Introduction，第 1–2 页）。\n\n医学图像的跨域困难来自扫描设备、成像序列、医院流程和人群差异。只在一个源域训练时，模型很容易把这些外观差异当成解剖线索；论文提出的增强、频率约束或形状先验，都是在减少这种错误依赖。",
     "contributions": [
       {
         "contribution": "提出 MEDU，将 CNN 与 SAM2 预训练 Transformer 编码器组合进 U-shaped segmentation network。",
@@ -64,16 +64,16 @@
         "type": "inferred",
         "original_question": null,
         "question": "在只有极少标注的单源域医学分割中，能否借助预训练 SAM2 特征和多尺度一致性学习提升未见域泛化？",
-        "how": "融合 CNN/SAM2 双编码器的多尺度特征，并在多种图像扰动下约束分割预测一致。",
-        "answer": "在三种跨模态/跨序列任务中，MEDU 使用 3–4 个标注体数据并取得高于论文对比方法的平均 Dice。",
-        "meaning": "视觉基础模型可作为少标注场景的初始化，但结构融合和一致性目标仍是泛化性能的重要组成。",
+        "how": "融合 CNN/SAM2 双编码器的多尺度特征，并在多种图像扰动下约束分割预测一致。\n\n论文在固定源域和目标域划分下比较完整方法、去掉单个模块的消融及不同跨域任务，以观察每种设计的作用范围。",
+        "answer": "在三种跨模态/跨序列任务中，MEDU 使用 3–4 个标注体数据并取得高于论文对比方法的平均 Dice。\n\n主结果与消融共同表明，结构稳定性、频率约束或测试时适应在部分域偏移下有效，但收益并非对所有中心相同。",
+        "meaning": "视觉基础模型可作为少标注场景的初始化，但结构融合和一致性目标仍是泛化性能的重要组成。\n\n这意味着后续方法必须说明自己依赖的域假设，并把边界质量、推理成本和跨中心稳定性与平均 Dice 一起报告。",
         "source": "Introduction，第 1–2 页，MICCAI 2025 PDF"
       }
     ],
     "research_questions_empty_reason": null,
     "research_questions_empty_source": null,
-    "method": "MEDU 用卷积编码器和基于 SAM2 的 Transformer 编码器提取特征，再在多个尺度融合。训练时对同一图像施加强度变化和通道丢弃，并约束不同扰动下的预测一致（Method，第 3–6 页）。",
-    "experiments_and_key_findings": "评估腹部 MRI→CT、腹部 CT→MRI 和心脏 bSSFP→LGE 三种设置，分别只用 3、4、3 个标注体数据。平均 Dice 为 81.75%、85.51% 和 78.24%；去掉层级一致性后，三个设置的结果都下降（Tables 1–4）。",
+    "method": "MEDU 用卷积编码器和基于 SAM2 的 Transformer 编码器提取特征，再在多个尺度融合。训练时对同一图像施加强度变化和通道丢弃，并约束不同扰动下的预测一致（Method，第 3–6 页）。\n\n阅读方法时应区分输入侧增强、表征侧约束和测试时更新三类操作，并记录每类操作发生在训练还是推理阶段。这样才能判断改进究竟来自更丰富的训练分布、更加稳定的特征，还是目标样本本身提供的适应信号。",
+    "experiments_and_key_findings": "评估腹部 MRI→CT、腹部 CT→MRI 和心脏 bSSFP→LGE 三种设置，分别只用 3、4、3 个标注体数据。平均 Dice 为 81.75%、85.51% 和 78.24%；去掉层级一致性后，三个设置的结果都下降（Tables 1–4）。\n\n跨模态、跨序列和跨中心结果应分开报告，并结合消融说明每个模块在哪种域偏移下有效。若某一目标域收益较小，需回到图像外观、解剖结构和标签质量分析原因，而不是只引用平均 Dice。",
     "limitations": {
       "author_reported": [
         "论文没有单列 Limitations 小节；结论归纳的是三个跨域设置上的结果，未声称涵盖所有器官、扫描协议或极少标注任务。"
@@ -84,7 +84,40 @@
       ]
     },
     "relation_to_research": "这是把基础视觉模型用于极少标注域泛化的代表工作。后续比较时应区分预训练特征收益、双编码器结构收益和一致性损失收益。",
-    "what_can_be_done_next": "复现三个源/目标划分后，分别测试只用卷积、只用 SAM2、双编码器和去掉一致性损失的版本，并报告不同随机种子的均值与方差。"
+    "what_can_be_done_next": [
+      {
+        "title": "逐模块做跨域消融",
+        "rationale": "论文把增强、频率约束、形状先验或测试时适应组合起来，单独收益需要在相同划分下确认。",
+        "concrete_plan": "保留同一源域和目标域，只移除一个模块或替换为简单基线。",
+        "validation": "报告 Dice、边界指标、多个随机种子和显存/时间。",
+        "expected_value": "找到在不同域偏移下真正必要的组件。",
+        "source": null
+      },
+      {
+        "title": "检验结构与外观解耦",
+        "rationale": "方法假设解剖结构比成像外观稳定，但不同器官和模态可能不满足同一假设。",
+        "concrete_plan": "对图像外观、背景和结构分别做可控替换，再观察预测变化。",
+        "validation": "测量结构保持、背景敏感度和边界质量。",
+        "expected_value": "验证模型是否学到稳定的医学证据。",
+        "source": null
+      },
+      {
+        "title": "测试更强域偏移",
+        "rationale": "现有目标域数量有限，医院、设备和人群变化可能超出论文实验范围。",
+        "concrete_plan": "加入未参与方法设计的新中心或跨设备数据，并冻结训练参数。",
+        "validation": "报告每个中心的性能、校准和失败案例。",
+        "expected_value": "评估方法面向真实部署的泛化上限。",
+        "source": null
+      },
+      {
+        "title": "控制推理时成本",
+        "rationale": "测试时适应或复杂增强可能提升精度，却增加每病例延迟和不稳定更新。",
+        "concrete_plan": "记录单病例适应步数、更新时间和显存，并与不适应基线比较。",
+        "validation": "在不同病例顺序下重复测试，检查灾难性漂移。",
+        "expected_value": "为临床流程选择可接受的精度-成本折中。",
+        "source": null
+      }
+    ]
   },
   "original_abstract": "We study single-source domain generalization with extremely few annotations. MEDU combines a CNN encoder and a pretrained SAM2 transformer encoder in a U-shaped network, with multiscale feature fusion and perturbation consistency training. Experiments cover abdominal MRI-to-CT, abdominal CT-to-MRI, and cardiac bSSFP-to-LGE settings.",
   "bibtex": null,

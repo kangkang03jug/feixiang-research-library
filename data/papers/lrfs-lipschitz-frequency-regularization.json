@@ -41,7 +41,7 @@
     "why_it_matters": "它提供了与数据增强互补的频域正则，但也说明正则权重需要随任务和损失函数重新调节。"
   },
   "detail": {
-    "motivation": "高频区域可能含有设备噪声，但分割边缘也位于高频。简单抹除高频会模糊边界，因此方法同时降低对高频变化的敏感度，并保留对中频变化的响应（Introduction，第 1–2 页）。",
+    "motivation": "高频区域可能含有设备噪声，但分割边缘也位于高频。简单抹除高频会模糊边界，因此方法同时降低对高频变化的敏感度，并保留对中频变化的响应（Introduction，第 1–2 页）。\n\n医学图像的跨域困难来自扫描设备、成像序列、医院流程和人群差异。只在一个源域训练时，模型很容易把这些外观差异当成解剖线索；论文提出的增强、频率约束或形状先验，都是在减少这种错误依赖。",
     "contributions": [
       {
         "contribution": "提出 LRFS，将高频/中频的谱扰动与潜在表征变化联系起来，分别形成敏感度约束。",
@@ -61,16 +61,16 @@
         "type": "inferred",
         "original_question": null,
         "question": "如何区分频谱中的域特异变化与有用边缘信息，并用可泛化的正则改善单源域模型在未见中心的性能？",
-        "how": "对高频和中频扰动分别施加 Lipschitz 型表征约束，再与分割任务损失联合训练。",
-        "answer": "在六中心前列腺 MRI 的四种模型上，目标域平均 Dice 均有提高；源域性能总体未明显牺牲。",
-        "meaning": "频率分解可用于调控模型表征稳定性，而不仅用于合成训练图像。",
+        "how": "对高频和中频扰动分别施加 Lipschitz 型表征约束，再与分割任务损失联合训练。\n\n论文在固定源域和目标域划分下比较完整方法、去掉单个模块的消融及不同跨域任务，以观察每种设计的作用范围。",
+        "answer": "在六中心前列腺 MRI 的四种模型上，目标域平均 Dice 均有提高；源域性能总体未明显牺牲。\n\n主结果与消融共同表明，结构稳定性、频率约束或测试时适应在部分域偏移下有效，但收益并非对所有中心相同。",
+        "meaning": "频率分解可用于调控模型表征稳定性，而不仅用于合成训练图像。\n\n这意味着后续方法必须说明自己依赖的域假设，并把边界质量、推理成本和跨中心稳定性与平均 Dice 一起报告。",
         "source": "Introduction，第 1–2 页，MICCAI 2024 PDF"
       }
     ],
     "research_questions_empty_reason": null,
     "research_questions_empty_source": null,
-    "method": "作者按频率划分低频、中频和高频，分别构造扰动，并用潜在表征的变化估计模型敏感度。高频项限制不稳定变化，中频项保留必要响应；两项正则与原任务损失联合训练（Method，第 3–5 页）。",
-    "experiments_and_key_findings": "训练只用 RUNMC 源中心，目标域包括 BIDMC、BMC、HK、UCL 和 HCRUDB。四种模型的目标域平均 Dice 都提高：U-Net 73.22→77.62，ResUNet 74.82→77.51，ResUNet++ 72.51→75.97，BayeSeg 77.80→81.94（Table 1）。",
+    "method": "作者按频率划分低频、中频和高频，分别构造扰动，并用潜在表征的变化估计模型敏感度。高频项限制不稳定变化，中频项保留必要响应；两项正则与原任务损失联合训练（Method，第 3–5 页）。\n\n阅读方法时应区分输入侧增强、表征侧约束和测试时更新三类操作，并记录每类操作发生在训练还是推理阶段。这样才能判断改进究竟来自更丰富的训练分布、更加稳定的特征，还是目标样本本身提供的适应信号。",
+    "experiments_and_key_findings": "训练只用 RUNMC 源中心，目标域包括 BIDMC、BMC、HK、UCL 和 HCRUDB。四种模型的目标域平均 Dice 都提高：U-Net 73.22→77.62，ResUNet 74.82→77.51，ResUNet++ 72.51→75.97，BayeSeg 77.80→81.94（Table 1）。\n\n跨模态、跨序列和跨中心结果应分开报告，并结合消融说明每个模块在哪种域偏移下有效。若某一目标域收益较小，需回到图像外观、解剖结构和标签质量分析原因，而不是只引用平均 Dice。",
     "limitations": {
       "author_reported": [
         "作者指出，权重可能需要随损失函数或 weight decay 改变而重新搜索；较大的 λ=0.1 在 BayeSeg 上明显变差（Experiments，第 7–8 页）。",
@@ -82,7 +82,40 @@
       ]
     },
     "relation_to_research": "LRFS 在模型表征层约束频率敏感度，适合与输入侧频谱增强方法做对照。公平比较时应同时报告边界质量、训练开销和权重调节范围。",
-    "what_can_be_done_next": "按原文六中心设置复现四种模型，报告正则权重扫描而不只给最优值；再用边界 Dice 或 HD95 检查抑制高频是否伤害轮廓，并与输入侧频谱增强组合。"
+    "what_can_be_done_next": [
+      {
+        "title": "逐模块做跨域消融",
+        "rationale": "论文把增强、频率约束、形状先验或测试时适应组合起来，单独收益需要在相同划分下确认。",
+        "concrete_plan": "保留同一源域和目标域，只移除一个模块或替换为简单基线。",
+        "validation": "报告 Dice、边界指标、多个随机种子和显存/时间。",
+        "expected_value": "找到在不同域偏移下真正必要的组件。",
+        "source": null
+      },
+      {
+        "title": "检验结构与外观解耦",
+        "rationale": "方法假设解剖结构比成像外观稳定，但不同器官和模态可能不满足同一假设。",
+        "concrete_plan": "对图像外观、背景和结构分别做可控替换，再观察预测变化。",
+        "validation": "测量结构保持、背景敏感度和边界质量。",
+        "expected_value": "验证模型是否学到稳定的医学证据。",
+        "source": null
+      },
+      {
+        "title": "测试更强域偏移",
+        "rationale": "现有目标域数量有限，医院、设备和人群变化可能超出论文实验范围。",
+        "concrete_plan": "加入未参与方法设计的新中心或跨设备数据，并冻结训练参数。",
+        "validation": "报告每个中心的性能、校准和失败案例。",
+        "expected_value": "评估方法面向真实部署的泛化上限。",
+        "source": null
+      },
+      {
+        "title": "控制推理时成本",
+        "rationale": "测试时适应或复杂增强可能提升精度，却增加每病例延迟和不稳定更新。",
+        "concrete_plan": "记录单病例适应步数、更新时间和显存，并与不适应基线比较。",
+        "validation": "在不同病例顺序下重复测试，检查灾难性漂移。",
+        "expected_value": "为临床流程选择可接受的精度-成本折中。",
+        "source": null
+      }
+    ]
   },
   "original_abstract": "We propose Lipschitz regularization via frequency spectrum (LRFS) for single-source domain generalization in medical image segmentation. It limits latent representation sensitivity to high-frequency components while encouraging sensitivity to middle-frequency components. Experiments across several model architectures show improved generalization.",
   "bibtex": null,

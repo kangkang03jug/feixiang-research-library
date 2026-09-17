@@ -44,7 +44,7 @@
     "why_it_matters": "它把频谱扰动和结构扰动结合起来，适用于三维胎儿脑分割和二维眼底分割两类任务。"
   },
   "detail": {
-    "motivation": "医疗数据往往只有一个源域，已有频谱交换还可能产生伪影或明显颜色变化。作者希望按频率统计特性改变外观，同时尽量保留分割结构（Introduction，第 1–2 页）。",
+    "motivation": "医疗数据往往只有一个源域，已有频谱交换还可能产生伪影或明显颜色变化。作者希望按频率统计特性改变外观，同时尽量保留分割结构（Introduction，第 1–2 页）。\n\n医学图像的跨域困难来自扫描设备、成像序列、医院流程和人群差异。只在一个源域训练时，模型很容易把这些外观差异当成解剖线索；论文提出的增强、频率约束或形状先验，都是在减少这种错误依赖。",
     "contributions": [
       {
         "contribution": "提出 RASS，对频谱幅度实施频率相关随机扰动，并与原始相位组合以合成训练图像。",
@@ -64,16 +64,16 @@
         "type": "inferred",
         "original_question": null,
         "question": "能否针对医学图像不同频率成分的统计特性构造单源训练增强，并结合结构扰动来提高未见域分割表现？",
-        "how": "设计频率相关的幅度谱随机合成，再结合随机掩码打乱和瓶颈特征重构。",
-        "answer": "在作者使用的 3D 胎儿脑和 2D 眼底跨域设置中，RAS4DG 优于所比较的 SSDG 方法；相对无 SSDG 基线有报告的平均 DSC 增益。",
-        "meaning": "频谱增强可能需要区分频带与模态，并与结构保持/恢复机制一起设计。",
+        "how": "设计频率相关的幅度谱随机合成，再结合随机掩码打乱和瓶颈特征重构。\n\n论文在固定源域和目标域划分下比较完整方法、去掉单个模块的消融及不同跨域任务，以观察每种设计的作用范围。",
+        "answer": "在作者使用的 3D 胎儿脑和 2D 眼底跨域设置中，RAS4DG 优于所比较的 SSDG 方法；相对无 SSDG 基线有报告的平均 DSC 增益。\n\n主结果与消融共同表明，结构稳定性、频率约束或测试时适应在部分域偏移下有效，但收益并非对所有中心相同。",
+        "meaning": "频谱增强可能需要区分频带与模态，并与结构保持/恢复机制一起设计。\n\n这意味着后续方法必须说明自己依赖的域假设，并把边界质量、推理成本和跨中心稳定性与平均 Dice 一起报告。",
         "source": "Introduction，第 1–2 页，MICCAI 2024 PDF"
       }
     ],
     "research_questions_empty_reason": null,
     "research_questions_empty_source": null,
-    "method": "先做傅里叶变换，在保留相位的情况下随机改变振幅谱；再随机打乱局部区域的像素，并在网络瓶颈处重组空间和通道特征（Method，第 3–6 页）。",
-    "experiments_and_key_findings": "实验包括 Atlas→FeTA2021 的三维胎儿脑分割，以及 DRIVE→IOSTAR/LES-AV 的二维眼底血管分割。相对无增强基线，三个目标域的平均 DSC 分别提高 8.15、8.43 和 13.71 个百分点（Experiments，第 6–8 页）。",
+    "method": "先做傅里叶变换，在保留相位的情况下随机改变振幅谱；再随机打乱局部区域的像素，并在网络瓶颈处重组空间和通道特征（Method，第 3–6 页）。\n\n阅读方法时应区分输入侧增强、表征侧约束和测试时更新三类操作，并记录每类操作发生在训练还是推理阶段。这样才能判断改进究竟来自更丰富的训练分布、更加稳定的特征，还是目标样本本身提供的适应信号。",
+    "experiments_and_key_findings": "实验包括 Atlas→FeTA2021 的三维胎儿脑分割，以及 DRIVE→IOSTAR/LES-AV 的二维眼底血管分割。相对无增强基线，三个目标域的平均 DSC 分别提高 8.15、8.43 和 13.71 个百分点（Experiments，第 6–8 页）。\n\n跨模态、跨序列和跨中心结果应分开报告，并结合消融说明每个模块在哪种域偏移下有效。若某一目标域收益较小，需回到图像外观、解剖结构和标签质量分析原因，而不是只引用平均 Dice。",
     "limitations": {
       "author_reported": [
         "论文指出 FedDG 属于多源域设置，且其 3D 实验不满足多源条件，因此没有提供 FedDG 的 3D 结果（Experiments，第 7 页）。",
@@ -85,7 +85,40 @@
       ]
     },
     "relation_to_research": "这项工作代表把频谱扰动和结构保持联合设计的路线。它可以与直接约束模型频率敏感度的方法在同一划分下比较。",
-    "what_can_be_done_next": "分别去掉频谱合成、局部打乱和特征重构，测量每个组件对 DSC、边界质量和类别结果的影响；再与其他频域增强方法做公平比较。"
+    "what_can_be_done_next": [
+      {
+        "title": "逐模块做跨域消融",
+        "rationale": "论文把增强、频率约束、形状先验或测试时适应组合起来，单独收益需要在相同划分下确认。",
+        "concrete_plan": "保留同一源域和目标域，只移除一个模块或替换为简单基线。",
+        "validation": "报告 Dice、边界指标、多个随机种子和显存/时间。",
+        "expected_value": "找到在不同域偏移下真正必要的组件。",
+        "source": null
+      },
+      {
+        "title": "检验结构与外观解耦",
+        "rationale": "方法假设解剖结构比成像外观稳定，但不同器官和模态可能不满足同一假设。",
+        "concrete_plan": "对图像外观、背景和结构分别做可控替换，再观察预测变化。",
+        "validation": "测量结构保持、背景敏感度和边界质量。",
+        "expected_value": "验证模型是否学到稳定的医学证据。",
+        "source": null
+      },
+      {
+        "title": "测试更强域偏移",
+        "rationale": "现有目标域数量有限，医院、设备和人群变化可能超出论文实验范围。",
+        "concrete_plan": "加入未参与方法设计的新中心或跨设备数据，并冻结训练参数。",
+        "validation": "报告每个中心的性能、校准和失败案例。",
+        "expected_value": "评估方法面向真实部署的泛化上限。",
+        "source": null
+      },
+      {
+        "title": "控制推理时成本",
+        "rationale": "测试时适应或复杂增强可能提升精度，却增加每病例延迟和不稳定更新。",
+        "concrete_plan": "记录单病例适应步数、更新时间和显存，并与不适应基线比较。",
+        "validation": "在不同病例顺序下重复测试，检查灾难性漂移。",
+        "expected_value": "为临床流程选择可接受的精度-成本折中。",
+        "source": null
+      }
+    ]
   },
   "original_abstract": "We propose Random Amplitude Spectrum Synthesis (RASS) for single-source domain generalization in medical image segmentation. The framework also uses random mask shuffle (RMS) and a reconstruction design (RSD) to encourage structural representation learning. It is evaluated on 3D fetal brain and 2D fundus segmentation.",
   "bibtex": null,
