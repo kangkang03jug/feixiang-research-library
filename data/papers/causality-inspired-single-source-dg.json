@@ -39,14 +39,14 @@
   "relevance": "High",
   "reading_basis": "full_text",
   "quick_read": {
-    "tldr": "该工作用两类因果启发的训练期干预处理单源域偏移：随机浅层网络合成强度与纹理变化；独立重采样潜在相关对象的外观，降低模型依赖背景捷径的风险。",
-    "problem_and_motivation": "当模型只见过一个采集中心时，图像外观、扫描协议以及背景与目标之间的共现关系可能成为脆弱线索，并在目标域改变。",
-    "core_method": "GIN（Global Intensity non-linear augmentation）用随机加权浅层网络产生外观变换；IPA（Interventional Pseudo-correlation Augmentation）将潜在相关区域外观独立重采样，模拟打断伪相关的干预。",
-    "key_results": "论文在 CT-MRI 腹部、bSSFP-LGE 心脏和跨中心前列腺 MRI 三种任务上报告，相比竞争方法在未见域取得持续性能增益（arXiv v5 摘要及 Experiments）。",
-    "why_it_matters": "它强调只做风格增强可能不足以去除模型学到的捷径，为后续把域随机化与因果不变性结合提供了具体方案。此条报告基于 arXiv v5；作者说明该稿与大幅修订后的 TMI 最终版不同。"
+    "tldr": "方法用两种训练期干预处理单源域偏移：随机改变图像外观，并打断目标与背景之间的伪相关。",
+    "problem_and_motivation": "只看到一个采集中心时，模型可能记住设备外观或背景线索；这些线索换到新中心就会失效。",
+    "core_method": "GIN 生成强度和纹理变化；IPA 独立重采样可能相关区域的外观，减少模型依赖背景捷径。",
+    "key_results": "在腹部、心脏和前列腺三种跨域分割任务上，作者报告未见域性能持续提升。",
+    "why_it_matters": "它说明域泛化不仅要改变风格，也要主动削弱容易失效的相关线索。"
   },
   "detail": {
-    "motivation": "作者将采集流程视为图像外观变化的重要来源，并指出模型可能把目标结构与背景对象之间偶然形成的共现关系当作预测线索；这些关系在未见中心可能失效。因而，目标不只是扩展图像外观，还要干预这类伪相关（Introduction；arXiv HTML，第 1–2 节）。",
+    "motivation": "模型可能把目标结构与背景之间偶然共现的线索当成依据；换到新中心后，这些线索可能失效。因此作者同时改变外观并干预伪相关（Introduction，第 1–2 节）。",
     "contributions": [
       {
         "contribution": "提出 GIN，以随机加权浅层网络构造多样的非线性强度与纹理外观，尽量保持解剖形状。",
@@ -74,8 +74,8 @@
     ],
     "research_questions_empty_reason": null,
     "research_questions_empty_source": null,
-    "method": "方法由 GIN 和 IPA 组成。GIN 使用随机加权浅层网络对输入图像执行非线性强度/纹理变换，使训练看到不同外观而保留分割结构。IPA 根据对象与背景的潜在共现构造伪相关图，再把相关区域外观独立重采样，以近似干预并减少模型依赖域特异背景线索。两者共同作用于单源训练（Method，第 III-B、III-C 节）。",
-    "experiments_and_key_findings": "研究涵盖腹部 CT↔MRI、心脏 bSSFP↔LGE 和前列腺跨中心 MRI 三种任务。arXiv v5 报告在未见域相对竞争方法持续提升；消融部分显示 IPA 的作用在心脏和前列腺设置尤其明显，作者报告 Wilcoxon signed-rank 检验 p<0.001（Experiments，第 IV-C、IV-D 节）。",
+    "method": "GIN 用随机加权浅层网络改变图像强度和纹理，同时尽量保持解剖结构。IPA 独立重采样可能相关区域的外观，减少模型依赖域特有的背景线索。两者共同用于单源训练（Method，第 III-B、III-C 节）。",
+    "experiments_and_key_findings": "实验覆盖腹部 CT-MRI、心脏 bSSFP-LGE 和前列腺跨中心 MRI。作者报告三种未见域都获得持续提升；消融显示 IPA 在心脏和前列腺设置中的作用更明显（Experiments，第 IV-C、IV-D 节）。",
     "limitations": {
       "author_reported": [
         "当前条目依据 arXiv v5 全文；arXiv 页面明确说明这是早期版本，且 IEEE TMI 同行评审最终版已大幅修订，因此不能把此报告直接等同于最终版的全部细节。",
@@ -86,8 +86,8 @@
         "与外观合成方法相比，因果干预的收益需要通过统一数据划分和充分消融分开量化。"
       ]
     },
-    "relation_to_research": "此论文是将外观不变性与伪相关去除联系起来的基础工作。研究单源域泛化时，可把它与 RAS4DG、LRFS 的频谱干预路线，以及 MEDU 的一致性学习路线并列比较。",
-    "what_can_be_done_next": "阅读最终 IEEE TMI 版本并记录与 arXiv v5 的差异；复现时对 GIN、IPA 分别做消融，再用背景替换或区域重采样测试模型是否仍依赖域特异背景。"
+    "relation_to_research": "这项工作把外观变化和伪相关去除放在同一框架中。研究单源域泛化时，可以把它与频率扰动和一致性学习方法放在同一数据划分下比较。",
+    "what_can_be_done_next": "先阅读最终期刊版本并记录它与 arXiv 修订稿的差异。复现时分别去掉 GIN 和 IPA，再用背景替换或区域重采样检查模型是否仍依赖域特有背景。"
   },
   "original_abstract": "We investigate single-source domain generalization for cross-domain medical image segmentation. The proposed causality-inspired augmentation uses randomly weighted shallow networks to vary image appearance and independently resamples potentially correlated object appearances to remove spurious correlations. It is evaluated on cross-modality abdominal CT-MRI, cross-sequence cardiac bSSFP-LGE, and cross-site prostate MRI segmentation.",
   "bibtex": null,

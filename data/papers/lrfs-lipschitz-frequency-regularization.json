@@ -34,14 +34,14 @@
   "relevance": "High",
   "reading_basis": "full_text",
   "quick_read": {
-    "tldr": "LRFS 不直接生成大量增强图像，而是在频域构造扰动并以 Lipschitz 正则约束表征：降低模型对高频变化的敏感度，同时保留对中频变化的响应。",
-    "problem_and_motivation": "高频分量既可能包含设备相关噪声，也承载边缘等关键分割信息；一味抹除高频可能损害轮廓，作者尝试分别控制不同频段的表征敏感度。",
-    "core_method": "按低/中/高频划分图像频谱，通过高频扰动与中频扰动构造相邻输入，近似控制模型表征映射的 Lipschitz 常数，并把两项正则加到原任务损失上。",
-    "key_results": "在六个前列腺 MRI 中心、四类模型上，LRFS 均提高目标域平均 Dice；例如 U-Net 从 73.22 提高到 77.62，BayeSeg 从 77.80 提高到 81.94（MICCAI 2024 PDF，第 7–8 页，Table 1）。",
-    "why_it_matters": "它提供与数据增强互补的模型侧频域约束，结果同时提醒：正则权重会受损失函数与权重衰减影响，需要透明报告调参策略。"
+    "tldr": "LRFS 不生成大量增强图像，而是在频域构造扰动并约束模型表征：降低对高频变化的敏感度，同时保留对中频变化的必要响应。",
+    "problem_and_motivation": "高频既可能包含设备噪声，也承载分割边缘；一味去掉高频会损伤轮廓。作者希望分别控制模型对不同频段的敏感度。",
+    "core_method": "把图像频谱分成低频、中频和高频，用高频与中频扰动构造相邻输入，再以表征变化约束模型，并把这些约束加入任务损失。",
+    "key_results": "在六个前列腺 MRI 中心和四种模型上，目标域平均 Dice 都提高；例如 U-Net 从 73.22 提高到 77.62，BayeSeg 从 77.80 提高到 81.94（MICCAI 2024，Table 1）。",
+    "why_it_matters": "它提供了与数据增强互补的频域正则，但也说明正则权重需要随任务和损失函数重新调节。"
   },
   "detail": {
-    "motivation": "作者指出，高频区域可能含有设备噪声等域特异信息，但分割边缘也在高频中；简单移除高频会模糊边界。因此，方法目标是同时减少模型对高频变化的敏感度、鼓励对中频变化保持适当响应（Introduction，第 1–2 页）。",
+    "motivation": "高频区域可能含有设备噪声，但分割边缘也位于高频。简单抹除高频会模糊边界，因此方法同时降低对高频变化的敏感度，并保留对中频变化的响应（Introduction，第 1–2 页）。",
     "contributions": [
       {
         "contribution": "提出 LRFS，将高频/中频的谱扰动与潜在表征变化联系起来，分别形成敏感度约束。",
@@ -69,8 +69,8 @@
     ],
     "research_questions_empty_reason": null,
     "research_questions_empty_source": null,
-    "method": "作者按归一化频率划分 LF、MF、HF。构造高频或中频扰动后的图像，并以网络潜在表示变化估计 Lipschitz 常数；高频正则限制敏感度，中频项鼓励必要响应。总损失为原损失加 λMF·LMF 与 λHF·LHF，论文实验中两项权重相等（Method，第 3–5 页）。",
-    "experiments_and_key_findings": "训练只使用 RUNMC 源中心，目标域包含 BIDMC、BMC、HK、UCL、HCRUDB。对比 U-Net、ResUNet、ResUNet++ 和 BayeSeg，四种模型的目标域平均 Dice 均提高：例如 U-Net 73.22→77.62，ResUNet 74.82→77.51，ResUNet++ 72.51→75.97，BayeSeg 77.80→81.94（Experiments，第 6–8 页，Table 1）。",
+    "method": "作者按频率划分低频、中频和高频，分别构造扰动，并用潜在表征的变化估计模型敏感度。高频项限制不稳定变化，中频项保留必要响应；两项正则与原任务损失联合训练（Method，第 3–5 页）。",
+    "experiments_and_key_findings": "训练只用 RUNMC 源中心，目标域包括 BIDMC、BMC、HK、UCL 和 HCRUDB。四种模型的目标域平均 Dice 都提高：U-Net 73.22→77.62，ResUNet 74.82→77.51，ResUNet++ 72.51→75.97，BayeSeg 77.80→81.94（Table 1）。",
     "limitations": {
       "author_reported": [
         "作者指出，权重可能需要随损失函数或 weight decay 改变而重新搜索；较大的 λ=0.1 在 BayeSeg 上明显变差（Experiments，第 7–8 页）。",
@@ -81,8 +81,8 @@
         "现有实验主要是单一器官/模态的多中心前列腺 MRI，对跨模态泛化的证据有限。"
       ]
     },
-    "relation_to_research": "LRFS 与 RAS4DG 都把频域作为单源域泛化线索，但前者通过潜在表征正则约束模型、后者在输入频谱与局部结构上构造增强。可以在同一数据划分中比较性能、训练开销和边界保真。",
-    "what_can_be_done_next": "基于原论文六中心设置复现四种模型，报告 λ 扫描曲线而非单个最优值；另外用边界 Dice/HD95 检查抑制高频后是否伤害轮廓，再和 RAS4DG 的输入侧增强做组合实验。"
+    "relation_to_research": "LRFS 在模型表征层约束频率敏感度，适合与输入侧频谱增强方法做对照。公平比较时应同时报告边界质量、训练开销和权重调节范围。",
+    "what_can_be_done_next": "按原文六中心设置复现四种模型，报告正则权重扫描而不只给最优值；再用边界 Dice 或 HD95 检查抑制高频是否伤害轮廓，并与输入侧频谱增强组合。"
   },
   "original_abstract": "We propose Lipschitz regularization via frequency spectrum (LRFS) for single-source domain generalization in medical image segmentation. It limits latent representation sensitivity to high-frequency components while encouraging sensitivity to middle-frequency components. Experiments across several model architectures show improved generalization.",
   "bibtex": null,

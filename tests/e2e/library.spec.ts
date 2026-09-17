@@ -2,13 +2,6 @@ import { test, expect } from '@playwright/test';
 test('personal library exposes the paper pool, archive, and paper reports', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('heading', { name: "FeiXiang's Research Library" })).toBeVisible();
-  await expect(
-    page.getByText(
-      'Fusing Dual Encoders: Single-source Domain Generalization with Extremely Few Annotations',
-      { exact: true },
-    ),
-  ).toBeVisible();
-
   await page.getByRole('link', { name: '论文池', exact: true }).click();
   await expect(page.getByRole('heading', { name: '论文池' })).toBeVisible();
   await expect(

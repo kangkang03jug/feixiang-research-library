@@ -37,14 +37,14 @@
   "relevance": "High",
   "reading_basis": "full_text",
   "quick_read": {
-    "tldr": "RAS4DG 将频谱振幅扰动做成随机合成（RASS），并叠加局部随机遮挡/像素打乱（RMS）及特征重构（RSD），同时扰动风格并鼓励模型学习结构信息。",
-    "problem_and_motivation": "频域方法通常依赖频带交换或混合；作者观察到这些操作在其 Atlas 数据上可能造成伪影或明显颜色变化，并提出按频率差异设计扰动。",
-    "core_method": "对源图像做傅里叶变换，保留相位并对幅度谱施加频率相关的随机扰动；再以 RMS 扰动局部结构，并在瓶颈处用 RSD 重组空间与通道特征。",
-    "key_results": "在 FeTA2021、IOSTAR 与 LES-AV 测试中，相对不做 SSDG 的基线，作者报告平均 DSC 分别提高 8.15、8.43、13.71 个百分点；三个训练轮次取平均（MICCAI 2024 PDF，第 6–7 页，Table 1）。",
-    "why_it_matters": "这项方法把单源域频谱扰动从简单混合推进到按频率构造随机合成，也同时覆盖 3D 脑胎儿分割与 2D 眼底分割。"
+    "tldr": "RAS4DG 随机改变图像的频谱振幅，再配合局部像素打乱和特征重构，同时扰动外观并保留结构信息。",
+    "problem_and_motivation": "已有频谱交换可能产生伪影或明显颜色变化。作者希望根据频率差异生成更自然的训练变化，并减少模型依赖单一外观。",
+    "core_method": "保留相位、随机扰动振幅谱，生成新的外观；再对局部区域做随机打乱，并在瓶颈处重组特征。",
+    "key_results": "在 FeTA2021、IOSTAR 和 LES-AV 上，相对不做单源域泛化增强的基线，平均 DSC 分别提高 8.15、8.43 和 13.71 个百分点（MICCAI 2024，Table 1）。",
+    "why_it_matters": "它把频谱扰动和结构扰动结合起来，适用于三维胎儿脑分割和二维眼底分割两类任务。"
   },
   "detail": {
-    "motivation": "医疗数据收集与标注成本高，多个源域也可能受隐私和共享限制。作者观察到已有频谱交换在其数据上可能产生伪影或颜色变化，并提出频带扰动应考虑 2D/3D 医学图像中不同频率的统计差别（Introduction，第 1–2 页）。",
+    "motivation": "医疗数据往往只有一个源域，已有频谱交换还可能产生伪影或明显颜色变化。作者希望按频率统计特性改变外观，同时尽量保留分割结构（Introduction，第 1–2 页）。",
     "contributions": [
       {
         "contribution": "提出 RASS，对频谱幅度实施频率相关随机扰动，并与原始相位组合以合成训练图像。",
@@ -72,8 +72,8 @@
     ],
     "research_questions_empty_reason": null,
     "research_questions_empty_source": null,
-    "method": "RASS 对输入做傅里叶变换，在保留相位的情况下按频率位置随机扰动幅度谱，并逆变换得到风格变化图像。RMS 随机选取图像局部区域并打乱像素，增加结构局部变化；RSD 在网络瓶颈处从空间与通道维度重构特征，以降低冗余并保留有用信息（Method，第 3–6 页）。",
-    "experiments_and_key_findings": "论文在 Atlas→FeTA2021 的 3D 胎儿脑组织分割，以及 DRIVE→IOSTAR/LES-AV 的 2D 眼底血管分割中评估，统一骨干并以 DSC 衡量。相较无 SSDG 基线，FeTA2021、IOSTAR、LES-AV 的平均 DSC 分别提高 8.15、8.43、13.71 个百分点；相较监督上界的差距分别为 4.80、8.38、4.41 个百分点（Experiments，第 6–8 页）。",
+    "method": "先做傅里叶变换，在保留相位的情况下随机改变振幅谱；再随机打乱局部区域的像素，并在网络瓶颈处重组空间和通道特征（Method，第 3–6 页）。",
+    "experiments_and_key_findings": "实验包括 Atlas→FeTA2021 的三维胎儿脑分割，以及 DRIVE→IOSTAR/LES-AV 的二维眼底血管分割。相对无增强基线，三个目标域的平均 DSC 分别提高 8.15、8.43 和 13.71 个百分点（Experiments，第 6–8 页）。",
     "limitations": {
       "author_reported": [
         "论文指出 FedDG 属于多源域设置，且其 3D 实验不满足多源条件，因此没有提供 FedDG 的 3D 结果（Experiments，第 7 页）。",
@@ -84,8 +84,8 @@
         "报告的增益建立在统一骨干与特定源/目标数据设置上；在不同强度归一化、器官和噪声条件下仍需外部复现。"
       ]
     },
-    "relation_to_research": "此工作代表频谱扰动与结构保持联合设计的路线。可与 LRFS 的频率敏感度正则比较：RAS4DG 在输入数据空间造样本，LRFS 则直接限制模型潜在表征对频带扰动的敏感度。",
-    "what_can_be_done_next": "按论文拆分 RASS、RMS、RSD 的消融，并记录每个组件对 DSC、边界质量和类别级结果的影响；之后固定相同源/目标划分，与 LRFS 或基础频域增强进行公平比较。"
+    "relation_to_research": "这项工作代表把频谱扰动和结构保持联合设计的路线。它可以与直接约束模型频率敏感度的方法在同一划分下比较。",
+    "what_can_be_done_next": "分别去掉频谱合成、局部打乱和特征重构，测量每个组件对 DSC、边界质量和类别结果的影响；再与其他频域增强方法做公平比较。"
   },
   "original_abstract": "We propose Random Amplitude Spectrum Synthesis (RASS) for single-source domain generalization in medical image segmentation. The framework also uses random mask shuffle (RMS) and a reconstruction design (RSD) to encourage structural representation learning. It is evaluated on 3D fetal brain and 2D fundus segmentation.",
   "bibtex": null,
