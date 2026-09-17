@@ -62,6 +62,7 @@
     "research_questions": [
       {
         "type": "inferred",
+        "original_question": null,
         "question": "能否针对医学图像不同频率成分的统计特性构造单源训练增强，并结合结构扰动来提高未见域分割表现？",
         "how": "设计频率相关的幅度谱随机合成，再结合随机掩码打乱和瓶颈特征重构。",
         "answer": "在作者使用的 3D 胎儿脑和 2D 眼底跨域设置中，RAS4DG 优于所比较的 SSDG 方法；相对无 SSDG 基线有报告的平均 DSC 增益。",

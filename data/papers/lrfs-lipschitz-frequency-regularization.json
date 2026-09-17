@@ -59,6 +59,7 @@
     "research_questions": [
       {
         "type": "inferred",
+        "original_question": null,
         "question": "如何区分频谱中的域特异变化与有用边缘信息，并用可泛化的正则改善单源域模型在未见中心的性能？",
         "how": "对高频和中频扰动分别施加 Lipschitz 型表征约束，再与分割任务损失联合训练。",
         "answer": "在六中心前列腺 MRI 的四种模型上，目标域平均 Dice 均有提高；源域性能总体未明显牺牲。",

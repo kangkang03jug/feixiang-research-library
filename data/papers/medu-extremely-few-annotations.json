@@ -62,6 +62,7 @@
     "research_questions": [
       {
         "type": "inferred",
+        "original_question": null,
         "question": "在只有极少标注的单源域医学分割中，能否借助预训练 SAM2 特征和多尺度一致性学习提升未见域泛化？",
         "how": "融合 CNN/SAM2 双编码器的多尺度特征，并在多种图像扰动下约束分割预测一致。",
         "answer": "在三种跨模态/跨序列任务中，MEDU 使用 3–4 个标注体数据并取得高于论文对比方法的平均 Dice。",
