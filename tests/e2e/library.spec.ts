@@ -3,10 +3,11 @@ test('personal library exposes the paper pool, archive, and paper reports', asyn
   await page.goto('/');
   await expect(
     page.getByRole('heading', {
-      name: '医学图像分割单源域泛化（Single-Source Domain Generalization）',
+      name: '医学图像分割单源域泛化',
     }),
   ).toBeVisible();
-  await expect(page.locator('.hero-subtitle')).toHaveText('Research Library');
+  await expect(page.locator('.eyebrow')).toContainText('研究知识库 ·');
+  await expect(page.locator('.hero-subtitle')).toHaveText('研究知识库');
   await expect(page.locator('.hero .lede')).toContainText('面向医学图像分割单源域泛化');
   await page.getByRole('link', { name: '论文池', exact: true }).click();
   await expect(page.getByRole('heading', { name: '论文池' })).toBeVisible();

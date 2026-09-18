@@ -4,7 +4,7 @@ profile:
   description: '面向医学图像分割单源域泛化的中文研究知识库，持续整理论文、快速阅读摘要与可追溯的详细报告。'
 research_scope:
   primary:
-    - '医学图像分割单源域泛化（Single-Source Domain Generalization）'
+    - '医学图像分割单源域泛化'
   secondary:
     - '医学图像领域泛化与跨中心、跨模态、跨序列评估'
     - '频域建模、频谱增强与鲁棒表征'
