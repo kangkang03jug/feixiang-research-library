@@ -2,7 +2,9 @@ import { test, expect } from '@playwright/test';
 test('personal library exposes the paper pool, archive, and paper reports', async ({ page }) => {
   await page.goto('/');
   await expect(
-    page.getByRole('heading', { name: '医学图像分割单源域泛化（Single-Source Domain Generalization）' }),
+    page.getByRole('heading', {
+      name: '医学图像分割单源域泛化（Single-Source Domain Generalization）',
+    }),
   ).toBeVisible();
   await expect(page.locator('.hero-subtitle')).toHaveText('Research Library');
   await expect(page.locator('.hero .lede')).toContainText('面向医学图像分割单源域泛化');
